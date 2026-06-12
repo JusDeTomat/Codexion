@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/20 08:36:00 by mbichet           #+#    #+#             */
-/*   Updated: 2026/05/20 08:57:17 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/06/12 14:38:03 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	is_nuber(char *str)
 {
-	int i;
-	int j;
+	unsigned long i;
+	unsigned long j;
 
 	i = 0;
 	j = 0;
@@ -26,4 +26,12 @@ int	is_nuber(char *str)
 		i++;		
 	}
 	return (i == j);
+}
+
+int mprintf(pthread_mutex_t *mutex, char * str, long long time, int id)
+{
+	pthread_mutex_lock(mutex);
+	printf("%lld %d %s",time , id, str);
+	pthread_mutex_unlock(mutex);
+	return (0);
 }

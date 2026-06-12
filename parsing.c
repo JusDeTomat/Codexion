@@ -6,13 +6,13 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/20 08:19:29 by mbichet           #+#    #+#             */
-/*   Updated: 2026/05/20 12:55:31 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/06/08 13:46:10 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "header.h"
 
-int	parsing(int ac, char **av, Data *data)
+int	parsing(int ac, char **av, t_data *data)
 {
 	int	i;
 
@@ -37,7 +37,7 @@ int	parsing(int ac, char **av, Data *data)
 	return (1);
 }
 
-int parsing_error(int ac, char **av, Data *data)
+int parsing_error(int ac, char **av, t_data *data)
 {
 	int res;
 	
