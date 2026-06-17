@@ -1,119 +1,58 @@
-# include "header.h"
+#include "header.h"
 
-int	get_mode(t_coders *coders, int time, int mode)
+int	wait_for_action(t_coders *c, int mode)
 {
-	long long time_now;
+	long long	time;
+	long long	start;
 
-	time_now = get_current_time() - coders->time;
+	start = get_current_time();
 	if (mode == 0)
 	{
-		mprintf(coders->printf_mutex, "is compiling\n", time_now, coders->id);
-		time = coders->time_comp;
+		mprintf(c->data, "is compiling\n", c->id);
+		time = c->data->time_comp;
 	}
 	else if (mode == 1)
 	{
-		mprintf(coders->printf_mutex, "is debugging\n", time_now, coders->id);
-		time = coders->time_debug;
+		mprintf(c->data, "is debugging\n", c->id);
+		time = c->data->time_debug;
 	}
-	else if (mode == 2)
+	else
 	{
-		mprintf(coders->printf_mutex, "is refactoring\n", time_now, coders->id);
-		time = coders->time_refac;
+		mprintf(c->data, "is refactoring\n", c->id);
+		time = c->data->time_refac;
 	}
-	return (time);
-}
-
-int wait_for_action(t_coders *coders, int mode)
-{
-	int i;
-	int	time;
-	
-	i = 0;
-	time = get_mode(coders, 0, mode);
-	while(i < 10)
-	{
-		usleep((float)((time * 1000)) / 10);
-		i++;
-	}
+	while (get_current_time() - start < time && !c->data->stop_flag)
+		usleep(200);
 	return (1);
 }
 
-int check_fifo_edf(t_coders *coder, t_data *data, int l, int r)
+void	*action_coders(void *arg)
 {
-	int id = coder->id - 1;
+	t_coders	*c;
 
-	if (strcmp(data->scheduler, "fifo") == 0)
+	c = (t_coders *)arg;
+	if (c->id % 2 == 0)
+		usleep(1000); /* Anti-Deadlock : les pairs attendent 1ms */
+	if (c->data->nb_coders == 1)
 	{
-		if (data->states[l] == HUNGRY && data->request_time[l] < data->request_time[id])
-			return (0);
-		if (data->states[r] == HUNGRY && data->request_time[r] < data->request_time[id])
-			return (0);
+		demander_dongle(c->dongle_l, c);
+		while (!c->data->stop_flag)
+			usleep(1000);
+		return (NULL);
 	}
-	else if (strcmp(data->scheduler, "edf") == 0)
+	while (c->nb_comp > 0 && !c->data->stop_flag)
 	{
-		if (data->states[l] == HUNGRY && data->deadlines[l] < data->deadlines[id])
-			return (0);
-		if (data->states[r] == HUNGRY && data->deadlines[r] < data->deadlines[id])
-			return (0);
-	}
-	return (1);
-}
-
-int can_i_compile(t_coders *coder, t_data *data)
-{
-	int idx = coder->id - 1;
-	int left = (idx + 1) % data->nb_coders;
-	int right = (idx - 1 + data->nb_coders) % data->nb_coders;
-
-	if (data->states[left] == COMPILING || data->states[right] == COMPILING)
-		return (0);
-	return (check_fifo_edf(coder, data, left, right));
-}
-
-void demander_dongles(t_coders *coder, t_data *data)
-{
-	int idx = coder->id - 1;
-
-	pthread_mutex_lock(&data->arbiter_mutex);
-	data->states[idx] = HUNGRY;
-	data->request_time[idx] = get_current_time();
-	data->deadlines[idx] = data->request_time[idx] + coder->time_burn;
-	while (!can_i_compile(coder, data))
-		pthread_cond_wait(&data->cond_vars[idx], &data->arbiter_mutex);
-	data->states[idx] = COMPILING;
-	pthread_mutex_unlock(&data->arbiter_mutex);
-}
-
-void relacher_dongles(t_coders *coder, t_data *data)
-{
-	int idx = coder->id - 1;
-	int left = (idx + 1) % data->nb_coders;
-	int right = (idx - 1 + data->nb_coders) % data->nb_coders;
-
-	pthread_mutex_lock(&data->arbiter_mutex);
-	data->states[idx] = THINKING;
-	pthread_cond_signal(&data->cond_vars[left]);
-	pthread_cond_signal(&data->cond_vars[right]);
-	pthread_mutex_unlock(&data->arbiter_mutex);
-}
-
-void *action_coders(void *arg)
-{
-	t_coders	*coders;
-	t_data		*data;
-	int			i;
-
-	i = 0;
-	coders = (t_coders *)arg;
-	data = coders->global_data;
-	while (i < coders->nb_comp)
-	{
-		demander_dongles(coders, data);
-		wait_for_action(coders, 0);
-		relacher_dongles(coders, data);
-		wait_for_action(coders, 1);
-		wait_for_action(coders, 2);
-		i++;
+		demander_dongle(c->dongle_l, c);
+		if (c->data->stop_flag) break ;
+		demander_dongle(c->dongle_r, c);
+		if (c->data->stop_flag) break ;
+		c->last_compile_start = get_current_time();
+		wait_for_action(c, 0);
+		relacher_dongle(c->dongle_r);
+		relacher_dongle(c->dongle_l);
+		if (--c->nb_comp == 0) { c->finished = 1; break ; }
+		wait_for_action(c, 1);
+		wait_for_action(c, 2);
 	}
 	return (NULL);
 }

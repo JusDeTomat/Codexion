@@ -2,16 +2,25 @@
 
 int	start_simulation(t_data *data, t_coders *coders, pthread_t *th)
 {
-	int	a;
+	pthread_t	monitor_th;
+	int			a;
+	long long	now;
 
-	if (!init_all(data, coders))
+	if (!init_all(data, &coders))
 		return (1);
+	now = get_current_time();
+	data->start_time = now;
+	a = -1;
+	while (++a < data->nb_coders)
+		coders[a].last_compile_start = now;
 	a = -1;
 	while (++a < data->nb_coders)
 		pthread_create(&th[a], NULL, action_coders, &coders[a]);
-	a = 0;
-	while (a < data->nb_coders)
+	pthread_create(&monitor_th, NULL, monitor_routine, coders);
+	a = -1;
+	while (++a < data->nb_coders)
 		pthread_join(th[a], NULL);
+	pthread_join(monitor_th, NULL);
 	return (0);
 }
 

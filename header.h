@@ -8,16 +8,25 @@
 # include <pthread.h>
 # include <sys/time.h>
 
-typedef enum e_bool {
-	FALSE,
-	TRUE
-} bool;
+typedef struct s_req {
+	int			id;
+	long long	req_time;
+	long long	deadline;
+} t_req;
 
-typedef enum e_state {
-	THINKING,
-	HUNGRY,
-	COMPILING
-} t_state;
+typedef struct s_heap {
+	t_req	data[250];
+	int		size;
+	char	*scheduler;
+} t_heap;
+
+typedef struct s_dongle {
+	pthread_mutex_t	mutex;
+	pthread_cond_t	cond;
+	int				available;
+	long long		last_release;
+	t_heap			heap;
+} t_dongle;
 
 typedef struct s_data {
 	int				nb_coders;
@@ -28,46 +37,33 @@ typedef struct s_data {
 	int				nb_comp;
 	int				dongle_cooldown;
 	char 			*scheduler;
-	pthread_mutex_t	arbiter_mutex;
-	t_state			*states;
-	long long		*request_time;
-	long long		*deadlines;
-	pthread_cond_t	*cond_vars;
 	long long		start_time;
+	int				stop_flag;
+	pthread_mutex_t	printf_mutex;
+	t_dongle		*dongles;
 } t_data;
 
-typedef struct s_dongle
-{
-	pthread_mutex_t *mutex;
-	bool 			available;
-} t_dongle;
-
 typedef struct s_coders {
-	int				id;
-	long long		time;
-	int				nb_comp;
-	int				time_burn;
-	int				time_comp;
-	int				time_debug;
-	int				time_refac;
-	pthread_mutex_t *printf_mutex;
-	pthread_mutex_t *mutex;
-	t_dongle 		dongle_r;
-	t_dongle 		dongle_l;
-	t_data			*global_data;
+	int			id;
+	long long	last_compile_start;
+	int			nb_comp;
+	int			finished;
+	t_dongle	*dongle_l;
+	t_dongle	*dongle_r;
+	t_data		*data;
 } t_coders;
 
-int			is_nuber(char *str);
+long long	get_current_time(void);
+int			mprintf(t_data *data, char *str, int id);
 int			parsing_error(int ac, char **av, t_data *data);
-int			parsing(int ac, char **av, t_data *data);
-int			init_all(t_data *data, t_coders *coders);
+int			is_nuber(char *str);
+void		push_heap(t_heap *h, t_req req);
+void		pop_heap(t_heap *h);
+void		demander_dongle(t_dongle *d, t_coders *c);
+void		relacher_dongle(t_dongle *d);
+int			init_all(t_data *data, t_coders **coders);
 int			free_all(t_coders *coders, t_data *data);
 void		*action_coders(void *arg);
-int			mprintf(pthread_mutex_t *mutex, char * str, long long time, int id);
-long long	get_current_time(void);
-int			alloc_scheduling(t_data *data);
-int			init_coders_loop(t_data *d, t_coders *c, pthread_mutex_t *p, pthread_mutex_t *l);
-int			check_fifo_edf(t_coders *coder, t_data *data, int l, int r);
-void		free_dongles_and_printf(t_coders *coders, t_data *data);
+void		*monitor_routine(void *arg);
 
 #endif
