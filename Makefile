@@ -8,7 +8,7 @@ SRC		= main.c \
 		  tools_coder.c \
 
 run:
-	$(CC) $(SRC)
+	$(CC) *.c
 	./a.out 6 10 10 10 10 10 10 fifo
 
 debug:
