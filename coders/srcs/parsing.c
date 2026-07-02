@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/20 08:19:29 by mbichet           #+#    #+#             */
-/*   Updated: 2026/06/08 13:46:10 by mbichet          ###   ########lyon.fr   */
+/*   Created: 2026/06/30 13:03:23 by username          #+#    #+#             */
+/*   Updated: 2026/06/30 13:48:51 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "header.h"
+#include "header.h"
 
 int	parsing(int ac, char **av, t_data *data)
 {
@@ -21,7 +21,7 @@ int	parsing(int ac, char **av, t_data *data)
 		return (0);
 	while (++i < ac)
 	{
-		if (((1 <= i && i <= 7) && !is_nuber(av[i])) ||atoi(av[i]) == -1)
+		if (((1 <= i && i <= 7) && !is_nuber(av[i])) || atoi(av[i]) == -1)
 			return (2);
 		if (i == 8 && strcmp(av[i], "fifo") && strcmp(av[i], "edf"))
 			return (2);
@@ -37,17 +37,17 @@ int	parsing(int ac, char **av, t_data *data)
 	return (1);
 }
 
-int parsing_error(int ac, char **av, t_data *data)
+int	parsing_error(int ac, char **av, t_data *data)
 {
-	int res;
-	
+	int	res;
+
 	res = parsing(ac, av, data);
 	if (res == 1)
 		return (1);
 	else if (res == 0)
 		printf("you need exatly 8 argument and you have %d \n", ac - 1);
 	else if (res == 2)
-		printf("the parmeter type patern: '(int) * 7 (fifo or edf (str))' be careful overflow\n");
+		printf("the parmeter type paternal: '(int) * 7 \
+(fifo or edf(str)) ' be careful overflow\n");
 	return (0);
 }
-

@@ -1,9 +1,9 @@
 #include "header.h"
 
-void	demander_dongle(t_dongle *d, t_coders *c)
+int	ask_dongle(t_dongle *d, t_coders *c)
 {
 	t_req		req;
-	long long	now;
+	long long	now;	
 
 	req.id = c->id;
 	req.req_time = get_current_time();
@@ -19,15 +19,17 @@ void	demander_dongle(t_dongle *d, t_coders *c)
 			{
 				pop_heap(&d->heap);
 				d->available = 0;
-				break ;
+				pthread_mutex_unlock(&d->mutex);
+				return (1);
 			}
 		}
 		pthread_cond_wait(&d->cond, &d->mutex);
 	}
 	pthread_mutex_unlock(&d->mutex);
+	return (0);
 }
 
-void	relacher_dongle(t_dongle *d)
+void	drop_dongle(t_dongle *d)
 {
 	pthread_mutex_lock(&d->mutex);
 	d->available = 1;

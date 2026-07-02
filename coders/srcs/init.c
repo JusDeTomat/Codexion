@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/30 12:44:00 by username          #+#    #+#             */
+/*   Updated: 2026/06/30 13:34:29 by mbichet          ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
 int	init_dongles(t_data *data)
@@ -30,7 +42,7 @@ int	init_coders(t_data *data, t_coders *coders)
 		coders[i].id = i + 1;
 		coders[i].last_compile_start = data->start_time;
 		coders[i].nb_comp = data->nb_comp;
-		coders[i].finished = (data->nb_comp == 0) ? 1 : 0;
+		coders[i].finished = (data->nb_comp == 0);
 		coders[i].dongle_l = &data->dongles[i];
 		coders[i].dongle_r = &data->dongles[(i + 1) % data->nb_coders];
 		coders[i].data = data;
