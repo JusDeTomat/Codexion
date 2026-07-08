@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:59:14 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/08 12:56:26 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 14:29:58 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ typedef struct s_data
 	char			*scheduler;
 	long long		start_time;
 	int				stop_flag;
+	int				error;
 	pthread_mutex_t	printf_mutex;
 	pthread_mutex_t	state_mutex;
 	t_dongle		*dongles;
@@ -77,6 +78,8 @@ void		choose_first(t_dongle *first, t_dongle *second, t_coders *c);
 int			mprintf(t_data *data, char *str, int id);
 int			get_stop_flag(t_data *data);
 void		set_stop_flag(t_data *data, int val);
+int			get_error(t_data *data);
+void		set_error(t_data *data, int val);
 long long	get_last_compile_start(t_coders *c);
 void		set_last_compile_start(t_coders *c, long long val);
 int			get_finished(t_coders *c);
@@ -94,5 +97,7 @@ void		*monitor(void *arg);
 int			check_dongle(t_dongle *first, t_dongle *second, t_coders *c);
 int			refac_comp(t_coders *c);
 int			wait_for_action(t_coders *c, int mode);
+int			init_theard(t_data *data, t_coders **coders,
+				pthread_t *monitor_th, pthread_t **th);
 
 #endif

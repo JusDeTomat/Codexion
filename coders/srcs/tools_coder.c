@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:58:45 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/08 13:09:31 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 14:30:36 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	wait_for_action(t_coders *c, int mode)
 		time = c->data->time_refac;
 	}
 	while (get_current_time() - start < time && !get_stop_flag(c->data))
-		usleep(10);
+		usleep(100);
 	return (1);
 }
 
@@ -67,6 +67,8 @@ void	*action_coders(void *arg)
 	t_coders	*c;
 
 	c = (t_coders *) arg;
+	while (get_error(c->data) == 0)
+		usleep(100);
 	if (c->id % 2 == 0)
 		usleep(10);
 	coders(c);

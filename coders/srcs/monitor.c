@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:58:33 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/06 10:19:32 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 14:18:47 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	*monitor(void *arg)
 	d = c[0].data;
 	while (!get_stop_flag(d))
 	{
+		usleep(100);
 		i = -1;
 		done = 1;
 		while (++i < d->nb_coders)

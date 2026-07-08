@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 16:32:44 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/06 10:20:04 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 14:27:46 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	start_simulation(t_data *data, t_coders **coders, pthread_t **th)
 	int			a;
 	long long	now;
 
+	monitor_th = 0;
 	if (!init_all(data, coders))
 		return (1);
 	*th = malloc(sizeof(pthread_t) * data->nb_coders);
@@ -28,10 +29,8 @@ int	start_simulation(t_data *data, t_coders **coders, pthread_t **th)
 	a = -1;
 	while (++a < data->nb_coders)
 		(*coders)[a].last_compile_start = now;
-	a = -1;
-	while (++a < data->nb_coders)
-		pthread_create(&(*th)[a], NULL, action_coders, &(*coders)[a]);
-	pthread_create(&monitor_th, NULL, monitor, *coders);
+	if (!init_theard(data, coders, &monitor_th, th))
+		return (0);
 	a = -1;
 	while (++a < data->nb_coders)
 		pthread_join((*th)[a], NULL);

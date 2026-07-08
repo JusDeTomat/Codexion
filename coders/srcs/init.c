@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:59:07 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/06 10:19:15 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 14:30:14 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ int	init_dongles(t_data *data)
 		data->dongles[i].last_release = 0;
 		data->dongles[i].heap.size = 0;
 		data->dongles[i].heap.scheduler = data->scheduler;
+		data->error = 0;
 	}
 	return (1);
 }
@@ -63,4 +64,26 @@ int	init_all(t_data *data, t_coders **coders)
 	if (!*coders)
 		return (0);
 	return (init_coders(data, *coders));
+}
+
+int init_theard(t_data *data, t_coders **coders, pthread_t *monitor_th, pthread_t **th)
+{
+	int	a;
+
+	a = 0;
+	while (a < data->nb_coders)
+	{
+		if (pthread_create(&(*th)[a], NULL, action_coders, &(*coders)[a]) != 0)
+			break ;
+		a ++;
+	}
+	if (pthread_create(monitor_th, NULL, monitor, *coders) != 0)
+		a = -1;
+	if (a != data->nb_coders)
+		return (0);
+	set_error(data, 1);
+	pthread_mutex_lock(&data->printf_mutex);
+	printf("end\n");
+	pthread_mutex_unlock(&data->printf_mutex);
+	return (1);
 }

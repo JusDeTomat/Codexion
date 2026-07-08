@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:58:54 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/06 10:30:16 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 14:29:47 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,5 +63,22 @@ void	set_stop_flag(t_data *data, int val)
 {
 	pthread_mutex_lock(&data->state_mutex);
 	data->stop_flag = val;
+	pthread_mutex_unlock(&data->state_mutex);
+}
+
+int	get_error(t_data *data)
+{
+	int	val;
+
+	pthread_mutex_lock(&data->state_mutex);
+	val = data->error;
+	pthread_mutex_unlock(&data->state_mutex);
+	return (val);
+}
+
+void	set_error(t_data *data, int val)
+{
+	pthread_mutex_lock(&data->state_mutex);
+	data->error = val;
 	pthread_mutex_unlock(&data->state_mutex);
 }
