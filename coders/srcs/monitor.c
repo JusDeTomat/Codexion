@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                       :::      ::::::::    */
-/*   monitor.c                                         :+:      :+:    :+:    */
-/*                                                   +:+ +:+         +:+      */
-/*   By: username <username@student.42tokyo.jp>    #+#  +:+       +#+         */
-/*                                               +#+#+#+#+#+   +#+            */
-/*   Created: 2026/06/30 12:46:11 by username         #+#    #+#              */
-/*   Updated: 2026/06/30 12:57:58 by username        ###   ########.fr        */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/02 15:58:33 by mbichet           #+#    #+#             */
+/*   Updated: 2026/07/06 10:19:32 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,10 @@ int	check_death(t_coders *c, t_data *data, int i)
 	long long	now;
 
 	now = get_current_time();
-	if (!c[i].finished && now - c[i].last_compile_start >= data->time_burn)
+	if (!get_finished(&c[i])
+		&& now - get_last_compile_start(&c[i]) >= data->time_burn)
 	{
-		data->stop_flag = 1;
+		set_stop_flag(data, 1);
 		mprintf(data, "burned out\n", c[i].id);
 		return (1);
 	}
@@ -48,20 +49,21 @@ void	*monitor(void *arg)
 
 	c = (t_coders *) arg;
 	d = c[0].data;
-	while (!d->stop_flag)
+	while (!get_stop_flag(d))
 	{
 		i = -1;
 		done = 1;
 		while (++i < d->nb_coders)
 		{
-			if (!c[i].finished)
+			if (!get_finished(&c[i]))
 				done = 0;
 			if (check_death(c, d, i))
 				break ;
 		}
-		if (done || d->stop_flag)
-			break ;
 		check_coder(d);
+		if (done || get_stop_flag(d))
+			break ;
 	}
+	check_coder(d);
 	return (NULL);
 }

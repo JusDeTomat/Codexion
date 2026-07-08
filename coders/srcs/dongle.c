@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   dongle.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/02 14:28:40 by mbichet           #+#    #+#             */
+/*   Updated: 2026/07/06 10:18:35 by mbichet          ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
 int	ask_dongle(t_dongle *d, t_coders *c)
@@ -10,7 +22,7 @@ int	ask_dongle(t_dongle *d, t_coders *c)
 	req.deadline = c->last_compile_start + c->data->time_burn;
 	pthread_mutex_lock(&d->mutex);
 	push_heap(&d->heap, req);
-	while (!c->data->stop_flag)
+	while (!get_stop_flag(c->data))
 	{
 		now = get_current_time();
 		if (d->available && now - d->last_release >= c->data->dongle_cooldown)

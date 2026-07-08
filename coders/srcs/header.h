@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/30 12:41:28 by username          #+#    #+#             */
-/*   Updated: 2026/06/30 13:20:33 by mbichet          ###   ########lyon.fr   */
+/*   Created: 2026/07/02 15:59:14 by mbichet           #+#    #+#             */
+/*   Updated: 2026/07/08 12:56:26 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,22 +56,31 @@ typedef struct s_data
 	long long		start_time;
 	int				stop_flag;
 	pthread_mutex_t	printf_mutex;
+	pthread_mutex_t	state_mutex;
 	t_dongle		*dongles;
 }	t_data;
 
 typedef struct s_coders
 {
-	int			id;
-	long long	last_compile_start;
-	int			nb_comp;
-	int			finished;
-	t_dongle	*dongle_l;
-	t_dongle	*dongle_r;
-	t_data		*data;
+	int				id;
+	long long		last_compile_start;
+	pthread_mutex_t	coder_mutex;
+	int				nb_comp;
+	int				finished;
+	t_dongle		*dongle_l;
+	t_dongle		*dongle_r;
+	t_data			*data;
 }	t_coders;
 
 long long	get_current_time(void);
+void		choose_first(t_dongle *first, t_dongle *second, t_coders *c);
 int			mprintf(t_data *data, char *str, int id);
+int			get_stop_flag(t_data *data);
+void		set_stop_flag(t_data *data, int val);
+long long	get_last_compile_start(t_coders *c);
+void		set_last_compile_start(t_coders *c, long long val);
+int			get_finished(t_coders *c);
+void		set_finished(t_coders *c, int val);
 int			parsing_error(int ac, char **av, t_data *data);
 int			is_nuber(char *str);
 void		push_heap(t_heap *h, t_req req);
@@ -82,5 +91,8 @@ int			init_all(t_data *data, t_coders **coders);
 int			free_all(t_coders *coders, t_data *data);
 void		*action_coders(void *arg);
 void		*monitor(void *arg);
+int			check_dongle(t_dongle *first, t_dongle *second, t_coders *c);
+int			refac_comp(t_coders *c);
+int			wait_for_action(t_coders *c, int mode);
 
 #endif

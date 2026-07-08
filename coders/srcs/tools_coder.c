@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/30 12:51:49 by username          #+#    #+#             */
-/*   Updated: 2026/06/30 13:19:18 by mbichet          ###   ########lyon.fr   */
+/*   Created: 2026/07/02 15:58:45 by mbichet           #+#    #+#             */
+/*   Updated: 2026/07/08 13:09:31 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,27 +33,15 @@ int	wait_for_action(t_coders *c, int mode)
 		mprintf(c->data, "is refactoring\n", c->id);
 		time = c->data->time_refac;
 	}
-	while (get_current_time() - start < time && !c->data->stop_flag)
+	while (get_current_time() - start < time && !get_stop_flag(c->data))
 		usleep(10);
-	return (1);
-}
-
-int	one_coder(t_coders *c)
-{
-	if (c->data->nb_coders == 1)
-	{
-		ask_dongle(c->dongle_l, c);
-		while (!c->data->stop_flag)
-			usleep(10);
-		return (0);
-	}
 	return (1);
 }
 
 void	coders(t_coders *c)
 {
-	t_dongle *first;
-	t_dongle *second;
+	t_dongle	*first;
+	t_dongle	*second;
 
 	if (c->id % 2 == 0)
 	{
@@ -65,28 +53,12 @@ void	coders(t_coders *c)
 		first = c->dongle_l;
 		second = c->dongle_r;
 	}
-	while (c->nb_comp > 0 && !c->data->stop_flag)
+	while (c->nb_comp > 0 && !get_stop_flag(c->data))
 	{
-		if (!ask_dongle(first, c))
+		if (!check_dongle(first, second, c))
 			break ;
-		mprintf(c->data, "has taken a dongle\n", c->id);
-		if (!ask_dongle(second, c))
-		{
-			drop_dongle(first);
+		if (!refac_comp(c))
 			break ;
-		}
-		mprintf(c->data, "has taken a dongle\n", c->id);
-		c->last_compile_start = get_current_time();
-		wait_for_action(c, 0);
-		drop_dongle(c->dongle_r);
-		drop_dongle(c->dongle_l);
-		if (--c->nb_comp == 0)
-		{
-			c->finished = 1;
-			break ;
-		}
-		wait_for_action(c, 1);
-		wait_for_action(c, 2);
 	}
 }
 
@@ -97,8 +69,6 @@ void	*action_coders(void *arg)
 	c = (t_coders *) arg;
 	if (c->id % 2 == 0)
 		usleep(10);
-	if (!one_coder(c))
-		return (NULL);
 	coders(c);
 	return (NULL);
 }

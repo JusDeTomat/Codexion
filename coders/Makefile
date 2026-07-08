@@ -4,6 +4,8 @@ INCLUDE			= -Iincludes
 OBJ_DIR			= obj
 C_FILES			= srcs/dongle.c \
 				  srcs/utils.c \
+				  srcs/utils2.c \
+				  srcs/utils3.c \
 				  srcs/parsing.c \
 				  srcs/free_all.c \
 				  srcs/heap.c \

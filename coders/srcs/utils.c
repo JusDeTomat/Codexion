@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                       :::      ::::::::    */
-/*   utils.c                                           :+:      :+:    :+:    */
-/*                                                   +:+ +:+         +:+      */
-/*   By: username <username@student.42tokyo.jp>    #+#  +:+       +#+         */
-/*                                               +#+#+#+#+#+   +#+            */
-/*   Created: 2026/06/30 12:57:10 by username         #+#    #+#              */
-/*   Updated: 2026/06/30 12:57:10 by username        ###   ########.fr        */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/02 15:58:54 by mbichet           #+#    #+#             */
+/*   Updated: 2026/07/06 10:30:16 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,28 @@ int	mprintf(t_data *data, char *str, int id)
 {
 	long long	t;
 
-	if (data->stop_flag && strcmp(str, "burned out\n") != 0)
+	if (get_stop_flag(data) && strcmp(str, "burned out\n") != 0)
 		return (0);
 	pthread_mutex_lock(&data->printf_mutex);
 	t = get_current_time() - data->start_time;
 	printf("%lld %d %s", t, id, str);
 	pthread_mutex_unlock(&data->printf_mutex);
 	return (0);
+}
+
+int	get_stop_flag(t_data *data)
+{
+	int	val;
+
+	pthread_mutex_lock(&data->state_mutex);
+	val = data->stop_flag;
+	pthread_mutex_unlock(&data->state_mutex);
+	return (val);
+}
+
+void	set_stop_flag(t_data *data, int val)
+{
+	pthread_mutex_lock(&data->state_mutex);
+	data->stop_flag = val;
+	pthread_mutex_unlock(&data->state_mutex);
 }

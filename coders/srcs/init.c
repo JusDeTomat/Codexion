@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/30 12:44:00 by username          #+#    #+#             */
-/*   Updated: 2026/06/30 13:34:29 by mbichet          ###   ########lyon.fr   */
+/*   Created: 2026/07/02 15:59:07 by mbichet           #+#    #+#             */
+/*   Updated: 2026/07/06 10:19:15 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ int	init_coders(t_data *data, t_coders *coders)
 	{
 		coders[i].id = i + 1;
 		coders[i].last_compile_start = data->start_time;
+		pthread_mutex_init(&coders[i].coder_mutex, NULL);
 		coders[i].nb_comp = data->nb_comp;
 		coders[i].finished = (data->nb_comp == 0);
 		coders[i].dongle_l = &data->dongles[i];
@@ -55,6 +56,7 @@ int	init_all(t_data *data, t_coders **coders)
 	data->start_time = get_current_time();
 	data->stop_flag = 0;
 	pthread_mutex_init(&data->printf_mutex, NULL);
+	pthread_mutex_init(&data->state_mutex, NULL);
 	if (!init_dongles(data))
 		return (0);
 	*coders = malloc(sizeof(t_coders) * data->nb_coders);
