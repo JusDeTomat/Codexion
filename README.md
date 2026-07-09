@@ -76,7 +76,9 @@ AI was only used to improve the README (grammar and formatting). No AI-generated
 
 ```
 .
-├── Makefile
 ├── README.md
-└── coders/
+├─── coders/
+├─────── Makefile
+└─────── src/
+
 ```
