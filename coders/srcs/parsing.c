@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:59:00 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/06 10:20:15 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 19:41:38 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@ int	parsing(int ac, char **av, t_data *data)
 	i = 0;
 	if (ac != 9)
 		return (0);
-	while (++i < ac)
+	while (++i < ac - 1)
 	{
-		if (((1 <= i && i <= 7) && !is_nuber(av[i])) || atoi(av[i]) == -1)
-			return (2);
-		if (i == 8 && strcmp(av[i], "fifo") && strcmp(av[i], "edf"))
+		if (((1 <= i && i <= 7) && !is_nuber(av[i])) || atoi(av[i]) <= 0 || strlen(av[i]) >= 11)
 			return (2);
 	}
+	if (i == 8 && strcmp(av[i], "fifo") && strcmp(av[i], "edf"))
+			return (2);
 	data->nb_coders = atoi(av[1]);
 	data->time_burn = atoi(av[2]);
 	data->time_comp = atoi(av[3]);

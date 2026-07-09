@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:59:07 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/08 14:30:14 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/08 17:38:20 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,6 @@ int init_theard(t_data *data, t_coders **coders, pthread_t *monitor_th, pthread_
 		return (0);
 	set_error(data, 1);
 	pthread_mutex_lock(&data->printf_mutex);
-	printf("end\n");
 	pthread_mutex_unlock(&data->printf_mutex);
 	return (1);
 }
