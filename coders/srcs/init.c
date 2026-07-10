@@ -6,7 +6,7 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 15:59:07 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/08 17:38:20 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/10 16:30:57 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,8 @@ int	init_all(t_data *data, t_coders **coders)
 	return (init_coders(data, *coders));
 }
 
-int init_theard(t_data *data, t_coders **coders, pthread_t *monitor_th, pthread_t **th)
+int	init_theard(t_data *data, t_coders **coders,
+	pthread_t *monitor_th, pthread_t **th)
 {
 	int	a;
 
@@ -77,10 +78,16 @@ int init_theard(t_data *data, t_coders **coders, pthread_t *monitor_th, pthread_
 			break ;
 		a ++;
 	}
-	if (pthread_create(monitor_th, NULL, monitor, *coders) != 0)
-		a = -1;
-	if (a != data->nb_coders)
+	if (pthread_create(monitor_th, NULL, monitor, *coders) != 0
+		|| a != data->nb_coders)
+	{
+		while (a > 0)
+		{
+			pthread_join((*th)[a], NULL);
+			a--;
+		}
 		return (0);
+	}
 	set_error(data, 1);
 	pthread_mutex_lock(&data->printf_mutex);
 	pthread_mutex_unlock(&data->printf_mutex);

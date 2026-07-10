@@ -6,24 +6,26 @@
 /*   By: mbichet <mbichet@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/06 10:22:55 by mbichet           #+#    #+#             */
-/*   Updated: 2026/07/06 16:23:56 by mbichet          ###   ########lyon.fr   */
+/*   Updated: 2026/07/10 11:02:40 by mbichet          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "header.h"
 
-void	choose_first(t_dongle *first, t_dongle *second, t_coders *c)
+int	refac_comp(t_coders *c)
 {
-	if (c->id % 2 == 0)
+	set_last_compile_start(c, get_current_time());
+	wait_for_action(c, 0);
+	drop_dongle(c->dongle_r);
+	drop_dongle(c->dongle_l);
+	if (--c->nb_comp == 0)
 	{
-		first = c->dongle_r;
-		second = c->dongle_l;
+		set_finished(c, 1);
+		return (0);
 	}
-	else
-	{
-		first = c->dongle_l;
-		second = c->dongle_r;
-	}
+	wait_for_action(c, 1);
+	wait_for_action(c, 2);
+	return (1);
 }
 
 long long	get_last_compile_start(t_coders *c)
